@@ -1,0 +1,28 @@
+title: "Sec Radar"
+description: "Daily-updated index of GitHub repos on Security, Architecture & System Design"
+baseurl: "/sec-radar"
+url: "https://sivolko.github.io"
+
+markdown:     kramdown
+highlighter:  rouge
+permalink:    /:year/:month/:day/:title/
+
+exclude:
+  - "*.sh"
+  - Makefile
+  - README.md
+
+collections:
+  posts:
+    output: true
+
+defaults:
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: post
+
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
