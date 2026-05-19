@@ -1,0 +1,8 @@
+docs/_site/
+docs/.jekyll-cache/
+docs/.jekyll-metadata
+docs/Gemfile.lock
+.DS_Store
+__pycache__/
+*.pyc
+.env
