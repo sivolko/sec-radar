@@ -1,0 +1,23 @@
+name: Daily Repo Update
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fetch-and-commit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip }
+      - run: pip install -r scripts/requirements.txt
+      - env: { GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+        run: python scripts/fetch_repos.py
+      - run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/_posts/ docs/_data/
+          git diff --staged --quiet || (git commit -m "chore: daily update $(date -u +'%Y-%m-%d')" && git push)
