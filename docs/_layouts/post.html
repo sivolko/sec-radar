@@ -1,0 +1,32 @@
+---
+layout: default
+---
+<div class="container">
+  <article class="post-detail">
+    <header class="post-detail-header">
+      <div class="post-detail-badges">
+        <span class="badge badge-{{ page.category }}">{{ page.category }}</span>
+        <span class="badge badge-sub">{{ page.subcategory }}</span>
+        {% if page.language != "Unknown" %}
+        <span class="badge badge-lang">{{ page.language }}</span>
+        {% endif %}
+      </div>
+      <h1><a href="{{ page.github_url }}" target="_blank" rel="noopener">{{ page.repo }}</a></h1>
+      <p class="post-detail-desc">{{ page.description }}</p>
+      <div class="post-detail-meta">
+        <span>⭐ {{ page.stars_display }}</span>
+        <span>🍴 {{ page.forks }}</span>
+        <span>🔄 {{ page.last_updated }}</span>
+        <span>📅 Discovered {{ page.date | date: "%Y-%m-%d" }}</span>
+      </div>
+    </header>
+    <div class="post-detail-body">{{ content }}</div>
+    {% if page.topics.size > 0 %}
+    <div class="post-topics">
+      {% for topic in page.topics %}<span class="topic-tag">{{ topic }}</span>{% endfor %}
+    </div>
+    {% endif %}
+    <a class="btn-github" href="{{ page.github_url }}" target="_blank" rel="noopener">View on GitHub →</a>
+    <div class="post-nav"><a href="{{ '/' | relative_url }}">← Back to feed</a></div>
+  </article>
+</div>
