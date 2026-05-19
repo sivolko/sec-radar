@@ -1,0 +1,209 @@
+---
+layout: default
+title: Sec Radar — Security, Architecture & System Design repos
+---
+
+<div class="container">
+
+  <section class="hero">
+    <h1>Sec Radar</h1>
+    <p>A daily-updated feed of the best GitHub repos on <strong>Security</strong>, <strong>Architecture</strong>, and <strong>System Design</strong>.</p>
+    <div class="hero-stats" id="heroStats">
+      <span id="totalCount">Loading…</span>
+    </div>
+  </section>
+
+  <section class="filters-section">
+    <div class="search-row">
+      <input type="search" id="searchInput" placeholder="Search repos, descriptions, topics…" autocomplete="off">
+    </div>
+
+    <div class="filter-row">
+      <div class="filter-group">
+        <label>Category</label>
+        <div class="pill-group" id="catFilter">
+          <button class="pill active" data-cat="all">All</button>
+          <button class="pill" data-cat="security">🔐 Security</button>
+          <button class="pill" data-cat="architecture">🏗 Architecture</button>
+          <button class="pill" data-cat="system-design">⚙️ System Design</button>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <label>Min Stars</label>
+        <div class="pill-group" id="starsFilter">
+          <button class="pill active" data-stars="0">All</button>
+          <button class="pill" data-stars="500">500+</button>
+          <button class="pill" data-stars="1000">1k+</button>
+          <button class="pill" data-stars="5000">5k+</button>
+          <button class="pill" data-stars="10000">10k+</button>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <label>Language</label>
+        <select id="langFilter">
+          <option value="all">All languages</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Sort</label>
+        <select id="sortSelect">
+          <option value="date-desc">Newest first</option>
+          <option value="date-asc">Oldest first</option>
+          <option value="stars-desc">Most stars</option>
+          <option value="stars-asc">Fewest stars</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="filter-row" id="subcatRow" style="display:none;">
+      <div class="filter-group" style="width:100%">
+        <label>Subcategory</label>
+        <div class="pill-group" id="subcatFilter"></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="results-bar">
+    <span id="resultsCount"></span>
+    <button class="reset-btn" id="resetBtn">Clear filters</button>
+  </div>
+
+  <section class="cards-grid" id="cardsGrid">
+    {% assign sorted_posts = site.posts | sort: "date" | reverse %}
+    {% for post in sorted_posts %}
+    <article class="repo-card"
+      data-repo="{{ post.repo }}"
+      data-category="{{ post.category }}"
+      data-subcategory="{{ post.subcategory }}"
+      data-stars="{{ post.stars }}"
+      data-language="{{ post.language | downcase }}"
+      data-date="{{ post.date | date: '%Y-%m-%d' }}"
+      data-search="{{ post.repo }} {{ post.description }} {{ post.topics | join: ' ' }} {{ post.subcategory }}"
+    >
+      <div class="card-header">
+        <div class="card-badges">
+          <span class="badge badge-{{ post.category }}">{{ post.category }}</span>
+          <span class="badge badge-sub">{{ post.subcategory }}</span>
+        </div>
+        <div class="card-meta-right">
+          {% if post.language != "Unknown" %}
+          <span class="lang-dot lang-{{ post.language | downcase | replace: ' ', '-' }}"></span>
+          <span class="card-lang">{{ post.language }}</span>
+          {% endif %}
+        </div>
+      </div>
+      <h2 class="card-title">
+        <a href="{{ post.url | relative_url }}">{{ post.repo }}</a>
+      </h2>
+      <p class="card-desc">{{ post.description | truncate: 120 }}</p>
+      <div class="card-footer">
+        <div class="card-stats">
+          <span title="Stars">⭐ {{ post.stars_display }}</span>
+          <span title="Forks">🍴 {{ post.forks }}</span>
+        </div>
+        <div class="card-links">
+          <a href="{{ post.url | relative_url }}" class="card-link">Details</a>
+          <a href="{{ post.github_url }}" target="_blank" rel="noopener" class="card-link card-link-gh">GitHub ↗</a>
+        </div>
+      </div>
+    </article>
+    {% endfor %}
+  </section>
+
+  <div class="no-results" id="noResults" style="display:none;">
+    <p>No repos match the current filters.</p>
+    <button class="reset-btn" onclick="resetAll()">Clear all filters</button>
+  </div>
+
+</div>
+
+<script>
+const state = { cat:'all', subcat:'all', stars:0, lang:'all', sort:'date-desc', query:'' };
+const cards = Array.from(document.querySelectorAll('.repo-card'));
+
+(function(){
+  const langs = [...new Set(cards.map(c=>c.dataset.language).filter(Boolean).sort())];
+  const sel = document.getElementById('langFilter');
+  langs.forEach(l=>{ const o=document.createElement('option'); o.value=l; o.textContent=l.charAt(0).toUpperCase()+l.slice(1); sel.appendChild(o); });
+})();
+
+const subcatMap={};
+cards.forEach(c=>{ const cat=c.dataset.category,sub=c.dataset.subcategory; if(!subcatMap[cat])subcatMap[cat]=new Set(); subcatMap[cat].add(sub); });
+
+function render(){
+  let visible=cards.filter(c=>{
+    if(state.cat!=='all'&&c.dataset.category!==state.cat)return false;
+    if(state.subcat!=='all'&&c.dataset.subcategory!==state.subcat)return false;
+    if(+c.dataset.stars<state.stars)return false;
+    if(state.lang!=='all'&&c.dataset.language!==state.lang)return false;
+    if(state.query&&!c.dataset.search.toLowerCase().includes(state.query.toLowerCase()))return false;
+    return true;
+  });
+  visible.sort((a,b)=>{
+    switch(state.sort){
+      case'stars-desc':return+b.dataset.stars-+a.dataset.stars;
+      case'stars-asc':return+a.dataset.stars-+b.dataset.stars;
+      case'date-asc':return a.dataset.date.localeCompare(b.dataset.date);
+      default:return b.dataset.date.localeCompare(a.dataset.date);
+    }
+  });
+  const grid=document.getElementById('cardsGrid');
+  cards.forEach(c=>c.style.display='none');
+  visible.forEach(c=>{c.style.display='';grid.appendChild(c);});
+  document.getElementById('resultsCount').textContent=`${visible.length} repo${visible.length!==1?'s':''} shown`;
+  document.getElementById('noResults').style.display=visible.length===0?'':'none';
+}
+
+function updateSubcatPills(){
+  const row=document.getElementById('subcatRow'),container=document.getElementById('subcatFilter');
+  container.innerHTML='';
+  if(state.cat==='all'){row.style.display='none';return;}
+  row.style.display='';
+  const all=document.createElement('button');
+  all.className='pill'+(state.subcat==='all'?' active':'');
+  all.textContent='All';
+  all.onclick=()=>{state.subcat='all';updateSubcatPills();render();};
+  container.appendChild(all);
+  [...(subcatMap[state.cat]||[])].sort().forEach(s=>{
+    const btn=document.createElement('button');
+    btn.className='pill'+(state.subcat===s?' active':'');
+    btn.textContent=s;
+    btn.onclick=()=>{state.subcat=s;updateSubcatPills();render();};
+    container.appendChild(btn);
+  });
+}
+
+document.getElementById('catFilter').addEventListener('click',e=>{
+  const btn=e.target.closest('[data-cat]');if(!btn)return;
+  document.querySelectorAll('#catFilter .pill').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');state.cat=btn.dataset.cat;state.subcat='all';
+  updateSubcatPills();render();
+});
+document.getElementById('starsFilter').addEventListener('click',e=>{
+  const btn=e.target.closest('[data-stars]');if(!btn)return;
+  document.querySelectorAll('#starsFilter .pill').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');state.stars=+btn.dataset.stars;render();
+});
+document.getElementById('langFilter').addEventListener('change',e=>{state.lang=e.target.value;render();});
+document.getElementById('sortSelect').addEventListener('change',e=>{state.sort=e.target.value;render();});
+let searchDebounce;
+document.getElementById('searchInput').addEventListener('input',e=>{
+  clearTimeout(searchDebounce);
+  searchDebounce=setTimeout(()=>{state.query=e.target.value.trim();render();},150);
+});
+function resetAll(){
+  state.cat='all';state.subcat='all';state.stars=0;state.lang='all';state.sort='date-desc';state.query='';
+  document.getElementById('searchInput').value='';
+  document.getElementById('langFilter').value='all';
+  document.getElementById('sortSelect').value='date-desc';
+  document.querySelectorAll('#catFilter .pill').forEach((p,i)=>p.classList.toggle('active',i===0));
+  document.querySelectorAll('#starsFilter .pill').forEach((p,i)=>p.classList.toggle('active',i===0));
+  updateSubcatPills();render();
+}
+document.getElementById('resetBtn').addEventListener('click',resetAll);
+document.getElementById('totalCount').textContent=`${cards.length} repos indexed across 3 domains`;
+render();
+</script>
