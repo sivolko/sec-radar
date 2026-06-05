@@ -605,6 +605,7 @@
   "apache/caldera",
   "apache/camel",
   "apache/causeway",
+  "apache/doris",
   "apache/dubbo",
   "apache/dubbo-admin",
   "apache/dubbo-go",
