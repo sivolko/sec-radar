@@ -671,6 +671,7 @@
   "aws/aws-app-mesh-examples",
   "aws/aws-sam-cli",
   "aws/aws-secretsmanager-agent",
+  "aws/aws-workload-credentials-provider",
   "aws/chalice",
   "aws/event-ruler",
   "aws/s2n-tls",
