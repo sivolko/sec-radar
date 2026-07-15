@@ -1106,6 +1106,7 @@
   "google/fuzzbench",
   "google/google-ctf",
   "google/honggfuzz",
+  "google/mantis",
   "google/mtail",
   "google/oss-fuzz",
   "google/oss-fuzz-gen",
