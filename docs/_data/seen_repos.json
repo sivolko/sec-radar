@@ -1,6 +1,7 @@
 [
   "0Chencc/CTFCrackTools",
   "0dayCTF/reverse-shell-generator",
+  "0sec-labs/0",
   "0sec-labs/foxguard",
   "0vercl0k/wtf",
   "0voice/expert_readed_books",
@@ -1685,6 +1686,7 @@
   "nshalabi/SysmonTools",
   "nsmfoo/antivmdetection",
   "nsqio/nsq",
+  "ntfargo/Relapse-Exploit",
   "ntop/nDPI",
   "ntop/ntopng",
   "nubenetes/awesome-kubernetes",
@@ -1791,6 +1793,7 @@
   "polardb/polardbx-sql",
   "polaris-gslb/polaris-gslb",
   "polarstreams/polar",
+  "polhenarejos/pico-fido",
   "pomerium/awesome-zero-trust",
   "pomerium/pomerium",
   "poulainpi/ddd-toolbox",
